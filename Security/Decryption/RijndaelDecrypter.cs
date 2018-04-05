@@ -8,15 +8,16 @@ using System.Threading.Tasks;
 
 namespace Journal.Security.Decryption
 {
-    class RijndaelDecrypter:IDecrypter
+    public class RijndaelDecrypter:IDecrypter
     {
         public string IV { get; }
         private byte[] _key { get; }
-
-        public RijndaelDecrypter(string iv,string password)
+        private int _blockSize;
+        public RijndaelDecrypter(string iv,string password,int blockSize=128)
         {
             this.IV = iv;
             this._key = KeyProvider.ObtainKey(password);
+            this._blockSize = blockSize;
         }
 
         public string Decrypt(string encryptedContent)
@@ -29,35 +30,28 @@ namespace Journal.Security.Decryption
                 using (var cs = new CryptoStream(ms, transform, CryptoStreamMode.Write))
                 {
                     cs.Write(buffer, 0, buffer.Length);
+
                     cs.FlushFinalBlock();
-                    decrypted = Encoding.UTF8.GetString(ms.ToArray());
+                    cs.Clear();
                     cs.Close();
+                    decrypted = Encoding.UTF8.GetString(ms.ToArray());
+                    ms.Close();
                 }
-                ms.Close();
             }
             return decrypted;
         }
 
         private ICryptoTransform GetDecryptor()
         {
-            var decodedIV = DecodeBase64(IV);
-            var iv = Encoding.Default.GetBytes(decodedIV);
+            var iv = DecodeBase64(IV);
 
-            var rijndael = new RijndaelManaged
-            {
-                BlockSize = 128,
-                IV = iv,
-                KeySize = 128,
-                Key = _key
-            };
-            
-
+            var rijndael = new RijndaelManaged {Key = _key, IV = iv};
            return rijndael.CreateDecryptor();
         }
-        private string DecodeBase64(string toDecode)
+        private byte[] DecodeBase64(string toDecode)
         {
             var base64EncodedBytes = System.Convert.FromBase64String(toDecode);
-            return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+            return base64EncodedBytes;
         }
     }
 }

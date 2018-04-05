@@ -8,52 +8,42 @@ using System.Threading.Tasks;
 
 namespace Journal.Security.Encryption
 {
-    class RijndaelEncryptor:IEncryptor
+    public class RijndaelEncryptor:IEncryptor
     {
 
         public string IV { get; }
         private byte[] _key { get; }
-
-        public RijndaelEncryptor(string iv, string password)
+        private int _blockSize;
+        public RijndaelEncryptor(string iv, string password,int blockSize=128)
         {
             this.IV = iv;
             this._key = KeyProvider.ObtainKey(password);
+            this._blockSize = blockSize;
         }
         private ICryptoTransform GetEncryptor()
         {
-            var decodedIV = DecodeBase64(IV);
-            var iv = Encoding.Default.GetBytes(decodedIV);
+            var decodedIV = IV;
+            var iv = Convert.FromBase64String(decodedIV);//Encoding.Default.GetBytes(decodedIV);
 
-            var rijndael = new RijndaelManaged
-            {
-                BlockSize = 128,
-                IV = iv,
-                KeySize = 128,
-                Key = _key
-            };
+            var rijndael = new RijndaelManaged() {Key = KeyProvider.ObtainKey("1111"), IV = iv};
 
 
             return rijndael.CreateEncryptor();
-        }
-        private string DecodeBase64(string toDecode)
-        {
-            var base64EncodedBytes = System.Convert.FromBase64String(toDecode);
-            return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
         }
 
         public string Encrypt(string content)
         {
             var encryptor = GetEncryptor();
-            var buffer = Convert.FromBase64String(content);
             string encrypted;
+            var bytes = Encoding.UTF8.GetBytes(content);
             using (var ms = new MemoryStream())
             {
                 using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
                 {
-                    cs.Write(buffer, 0, buffer.Length);
+                    cs.Write(bytes, 0, bytes.Length);
                     cs.FlushFinalBlock();
-                    encrypted = Encoding.UTF8.GetString(ms.ToArray());
                     cs.Close();
+                    encrypted = Convert.ToBase64String(ms.ToArray());
                 }
                 ms.Close();
             }

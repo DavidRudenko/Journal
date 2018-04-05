@@ -1,5 +1,7 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using GalaSoft.MvvmLight.Threading;
+using Journal.Security;
 
 namespace Journal
 {
@@ -11,6 +13,7 @@ namespace Journal
         static App()
         {
             DispatcherHelper.Initialize();
+            AppDomain.CurrentDomain.DomainUnload += (s, e) => KeyProvider.SaveKey();
         }
     }
 }

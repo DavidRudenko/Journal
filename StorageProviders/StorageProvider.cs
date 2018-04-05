@@ -5,12 +5,13 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Journal.Security;
 using Journal.Security.Decryption;
 using Journal.Security.Encryption;
 
 namespace Journal.StorageProviders
 {
-    class StorageProvider:IStorageProvider
+    public class StorageProvider:IStorageProvider
     {
         private DbContext _context { get; set; }
 
@@ -26,8 +27,14 @@ namespace Journal.StorageProviders
             var entitiesContext = (_context as JournalEntities);
             if(entitiesContext==null)
                 throw new ArgumentException($"{nameof(_context)} must be a JournalEntities instance");
-            return  entitiesContext.Entries.Select(c => new JournalEntry
-            (c.Content, DateTime.Parse(c.TimeStamp),new RijndaelDecrypter(c.IV,passwd),new RijndaelEncryptor(c.IV,passwd))).ToList();
+            var list = new List<JournalEntry>();
+            foreach (var entry in entitiesContext.Entries)
+            {
+                var decryptedContent = new RijndaelDecrypter(entry.IV, "1111").Decrypt(entry.Content);
+                var deryptedTimeStamp = new RijndaelDecrypter(entry.IV, "1111").Decrypt(entry.TimeStamp);
+                list.Add(new JournalEntry(decryptedContent,DateTime.Parse(deryptedTimeStamp), null,null));
+            }
+            return list;
         }
 
         public void AddEntry(JournalEntry entry)
@@ -35,7 +42,7 @@ namespace Journal.StorageProviders
             var entitiesContext = (_context as JournalEntities);
             if (entitiesContext == null)
                 throw new ArgumentException($"{nameof(_context)} must be a JournalEntities instance");
-            var iv = GenerateIV();
+            var iv = KeyProvider.GenerateIV(128);
             var encryptedTimeStamp =new RijndaelEncryptor(iv,"1111").Encrypt(entry.TimeStamp.ToString(CultureInfo.InvariantCulture));
             var encryptedContent=new RijndaelEncryptor(iv,"1111").Encrypt(entry.Content);
             entitiesContext.Entries.Add(new Entry()
@@ -45,16 +52,9 @@ namespace Journal.StorageProviders
                 TimeStamp = encryptedTimeStamp
             });
             entitiesContext.SaveChanges();
+            KeyProvider.SaveKey();
         }
 
-        private string GenerateIV()
-        {
-            var iv = new byte[128];
-            for (int i = 0; i < 128; i++)
-            {
-                iv[i] = (byte)new Random(Guid.NewGuid().GetHashCode()).Next(0, 256);
-            }
-            return System.Text.Encoding.UTF8.GetString(iv);
-        }
+        
     }
 }
