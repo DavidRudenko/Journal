@@ -2,6 +2,6 @@
 {
     public interface IDecrypter
     {
-        string Decrypt(string encryptedContent);
+        string Decrypt(string encryptedContent,string password);
     }
 }

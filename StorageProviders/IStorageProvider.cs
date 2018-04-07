@@ -9,7 +9,7 @@ namespace Journal.StorageProviders
 {
     public interface IStorageProvider
     {
-        List<JournalEntry> GetEntries(string passwd);
-        void AddEntry(JournalEntry entry);
+        List<JournalEntry> GetEntries(string password);
+        void AddEntry(JournalEntry entry,string password);
     }
 }

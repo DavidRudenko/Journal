@@ -1,81 +1,28 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
 
 namespace Journal.Security
 {
     public static class KeyProvider
     {
-        private static  byte[] _key;
-        private static string _passwd = "";
-        private static string keyPath = "../../sv.bin";
-        private static string passPath = "../.../pass.bin";
-        private static readonly object _locker = new object();
-        /// <summary>
-        /// Regenerates the key and resets the password
-        /// </summary>
-        /// <param name="passwd">new password</param>
-        /// <param name="blockSize">block size(in bits)</param>
-        public static void GenerateKey(string passwd,int blockSize)
+        private static byte[] _salt=new byte[16]  { 0x26, 0xdc, 0xff, 0x00, 0xad, 0xed, 0x7a,
+            0xee, 0xc5, 0xfe, 0x07, 0xaf, 0x4d, 0x08, 0x22, 0x3c };//Random salt, might put it into 
+        // file,but leaving it open won`t do much damage to security
+        private static object _locker = new object();
+        public static byte[] GetKey(string password)
         {
-            lock (_locker)
-            {
-                _key = new byte[blockSize / 8];
-                for (int i = 0; i < blockSize/8; i++)
-                {
-                    _key[i] = (byte) new Random(Guid.NewGuid().GetHashCode()).Next(0, 256);
-                }
-                _passwd = passwd;
-            }
+            var db=new Rfc2898DeriveBytes(password,_salt);
+            return db.GetBytes(32);
         }
 
-        /// <summary>
-        /// Returns the key if the password is correct, null otherwise
-        /// </summary>
-        /// <param name="passwd">password</param>
-        /// <returns></returns>
-        public static byte[] ObtainKey(string passwd)
+        public static byte[] GetIV(string password)
         {
-            if (_key == null)
-            {
-                GetKey();
-                
-            }
-            if (_passwd.Equals(passwd))
-                return _key;
-            return null;
-            
-        }
-
-        static KeyProvider()
-        {
-            GetKey();
-        }
-        private static void GetKey()
-        {
-            if (!File.Exists(keyPath))
-                return;
-            var bf=new BinaryFormatter();
-            var keyDesBase64 = (string)bf.Deserialize(new FileStream(keyPath,FileMode.Open));
-            _passwd = (string) bf.Deserialize(new FileStream(passPath, FileMode.Open));
-            _key = Convert.FromBase64String(keyDesBase64);
-        }
-        public static void SaveKey()
-        {
-            var bf = new BinaryFormatter();
-            bf.Serialize(new FileStream(keyPath,FileMode.OpenOrCreate),Convert.ToBase64String(_key));
-            bf.Serialize(new FileStream(passPath,FileMode.OpenOrCreate),_passwd);
-            
-        }
-        public static string GenerateIV(int blockSize)
-        {
-            var iv = new byte[blockSize / 8];
-            for (int i = 0; i < blockSize / 8; i++)
-            {
-                iv[i] = (byte)new Random(Guid.NewGuid().GetHashCode()).Next(0, 256);
-            }
-            return Convert.ToBase64String(iv);
+            var db=new Rfc2898DeriveBytes(password,_salt);
+            return db.GetBytes(16);
         }
     }
 }

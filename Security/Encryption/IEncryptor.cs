@@ -2,6 +2,6 @@
 {
    public interface IEncryptor
     {
-        string Encrypt(string content);
+        string Encrypt(string content,string password);
     }
 }

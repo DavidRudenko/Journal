@@ -10,30 +10,17 @@ namespace Journal.Security.Encryption
 {
     public class RijndaelEncryptor:IEncryptor
     {
-
-        public string IV { get; }
-        private byte[] _key { get; }
-        private int _blockSize;
-        public RijndaelEncryptor(string iv, string password,int blockSize=128)
+        
+        private ICryptoTransform GetEncryptor(string password)
         {
-            this.IV = iv;
-            this._key = KeyProvider.ObtainKey(password);
-            this._blockSize = blockSize;
-        }
-        private ICryptoTransform GetEncryptor()
-        {
-            var decodedIV = IV;
-            var iv = Convert.FromBase64String(decodedIV);//Encoding.Default.GetBytes(decodedIV);
-
-            var rijndael = new RijndaelManaged() {Key = KeyProvider.ObtainKey("1111"), IV = iv};
-
-
+            var rijndael = new RijndaelManaged() {Key = KeyProvider.GetKey(password), IV=KeyProvider.GetIV(password)};
             return rijndael.CreateEncryptor();
         }
-
-        public string Encrypt(string content)
+        
+        public string Encrypt(string content,string password)
         {
-            var encryptor = GetEncryptor();
+            var encryptor = GetEncryptor(password);
+            
             string encrypted;
             var bytes = Encoding.UTF8.GetBytes(content);
             using (var ms = new MemoryStream())

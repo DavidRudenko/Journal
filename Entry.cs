@@ -17,6 +17,5 @@ namespace Journal
         public int ID { get; set; }
         public string Content { get; set; }
         public string TimeStamp { get; set; }
-        public string IV { get; set; }
     }
 }

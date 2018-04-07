@@ -14,20 +14,12 @@ namespace Journal
     {
         public string Content { get; private set; }
         public DateTime TimeStamp { get; private set; }
-        private IDecrypter _decrypter;
-        private IEncryptor _encrypter;
-        public JournalEntry(string content, DateTime timeStamp,IDecrypter decrypter, IEncryptor encrypter)
+        public JournalEntry(string content, DateTime timeStamp)
         {
              TimeStamp = timeStamp;
              Content = content;
-            this._decrypter = decrypter;
-            this._encrypter = encrypter;
+            
         }
-        public void Decrypt(JournalEntry encryptedEntry)
-        {
-            this.TimeStamp =
-                DateTime.Parse(_decrypter.Decrypt(encryptedEntry.TimeStamp.ToString(CultureInfo.InvariantCulture)));
-            this.Content = _decrypter.Decrypt(encryptedEntry.Content);
-        }
+        
     }
 }

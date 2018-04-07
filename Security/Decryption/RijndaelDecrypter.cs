@@ -10,21 +10,12 @@ namespace Journal.Security.Decryption
 {
     public class RijndaelDecrypter:IDecrypter
     {
-        public string IV { get; }
-        private byte[] _key { get; }
-        private int _blockSize;
-        public RijndaelDecrypter(string iv,string password,int blockSize=128)
-        {
-            this.IV = iv;
-            this._key = KeyProvider.ObtainKey(password);
-            this._blockSize = blockSize;
-        }
 
-        public string Decrypt(string encryptedContent)
+        public string Decrypt(string encryptedContent,string password)
         {
             var buffer = Convert.FromBase64String(encryptedContent);
             string decrypted;
-            var transform = GetDecryptor();
+            var transform = GetDecryptor(password);
             using (var ms = new MemoryStream())
             {
                 using (var cs = new CryptoStream(ms, transform, CryptoStreamMode.Write))
@@ -41,17 +32,10 @@ namespace Journal.Security.Decryption
             return decrypted;
         }
 
-        private ICryptoTransform GetDecryptor()
+        private ICryptoTransform GetDecryptor(string password)
         {
-            var iv = DecodeBase64(IV);
-
-            var rijndael = new RijndaelManaged {Key = _key, IV = iv};
+            var rijndael = new RijndaelManaged {Key = KeyProvider.GetKey(password), IV = KeyProvider.GetIV(password)};
            return rijndael.CreateDecryptor();
-        }
-        private byte[] DecodeBase64(string toDecode)
-        {
-            var base64EncodedBytes = System.Convert.FromBase64String(toDecode);
-            return base64EncodedBytes;
         }
     }
 }

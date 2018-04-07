@@ -13,7 +13,6 @@ namespace Journal
         static App()
         {
             DispatcherHelper.Initialize();
-            AppDomain.CurrentDomain.DomainUnload += (s, e) => KeyProvider.SaveKey();
         }
     }
 }

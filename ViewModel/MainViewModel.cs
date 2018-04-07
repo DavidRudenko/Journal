@@ -43,7 +43,7 @@ namespace Journal.ViewModel
 
         private void GetEntries(string passwd)
         {
-            this.Entries = new ObservableCollection<JournalEntry>(_entriesProvider.GetEntries(passwd));
+            this.Entries = new ObservableCollection<JournalEntry>(_entriesProvider.GetEntries(""));//TODO:insert password
         }
         ////public override void Cleanup()
         ////{
