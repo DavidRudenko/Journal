@@ -85,11 +85,15 @@ namespace Journal.ViewModel
         private async void GetEntries(string passwd)
         {
             if (!KeyProvider.CorrectPassword(passwd))
+            {
                 RaiseGetEntriesFailed();
-            var task = Task<List<JournalEntry>>.Factory.StartNew(() =>
+                return;
+            }
+            var task =  new Task<List<JournalEntry>>(() =>
             {
                 return _entriesProvider.GetEntries(passwd);
             });
+            task.Start();
             var result = new List<JournalEntry>();
             try
             {

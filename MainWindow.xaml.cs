@@ -21,28 +21,28 @@ namespace Journal
             mv = ServiceLocator.Current.GetInstance<MainViewModel>();
             mv.GetEntriesFailed += (sender,e) =>
             {
-                getEntriesPasswordBox.Text = "";
+                getEntriesPasswordBox.Password = "";
                 AddEntrySP.Visibility = Visibility.Collapsed;
                 _wasClicked = !_wasClicked;
                 MessageBox.Show("Get Entries Failed");
             };
             mv.GetEntriesCompleted += (sender, e) =>
             {
-                getEntriesPasswordBox.Text = "";
+                getEntriesPasswordBox.Password = "";
                 AddEntrySP.Visibility = Visibility.Collapsed;
                 _wasClicked = !_wasClicked;
                 MessageBox.Show("Get Entries Succeeded");
             };
             mv.AddEntryCompleted += (sender, e) =>
             {
-                AddEntryPasswordBox.Text = "";
+                AddEntryPasswordBox.Password = "";
                 AddEntrySP.Visibility = Visibility.Collapsed;
                 _wasClicked = !_wasClicked;
                 MessageBox.Show("Add Entry Succeeded");
             };
             mv.AddEntryFailed += (sender, e) =>
             {
-                AddEntryPasswordBox.Text = "";
+                AddEntryPasswordBox.Password = "";
                 AddEntrySP.Visibility = Visibility.Collapsed;
                 _wasClicked = !_wasClicked;
                 MessageBox.Show("Add Entry Failed");
@@ -52,6 +52,7 @@ namespace Journal
 
         private void AddEntryButton_OnClick(object sender, RoutedEventArgs e)
         {
+
             if (_wasClicked)
                 AddEntrySP.Visibility = Visibility.Collapsed;
             if(!_wasClicked)
@@ -64,6 +65,16 @@ namespace Journal
         {
             MainViewModel.SetPassword(setPasswordBox.Password);
             setPassSP.Visibility = Visibility.Collapsed;
+        }
+
+        private void GetEntriesButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            mv.GetEntriesCommand.Execute(getEntriesPasswordBox.Password);
+        }
+
+        private void AddEntryActionButton_Onclick(object sender, RoutedEventArgs e)
+        {
+           mv.AddEntryCommand.Execute(AddEntryPasswordBox.Password);
         }
     }
 }

@@ -18,22 +18,22 @@
     </Window.Resources>
 
     <Grid x:Name="LayoutRoot">
-        <StackPanel Margin="10"  Orientation="Vertical">
+        <StackPanel Margin="0,15,0,20"  Orientation="Vertical">
             <StackPanel x:Name="setPassSP"  Orientation="Vertical">
                 <Button x:Name="SetPasswordBtn" Click="SetPasswordBtn_OnClick"  HorizontalAlignment="Center" Content="Set Password" FontSize="18"  />
-                <PasswordBox x:Name="setPasswordBox"  HorizontalAlignment="Center" MinHeight="20" Margin="5"  MinWidth="{Binding ActualWidth,ElementName=SetPasswordBtn}"/>
+                <PasswordBox x:Name="setPasswordBox"  Padding="5" HorizontalAlignment="Center"  Margin="5"  MinWidth="200"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBox  FontSize="18" Margin="0,0,10,0" x:Name="getEntriesPasswordBox" MinWidth="{Binding ActualWidth,ElementName=getEntriesButton}"  HorizontalAlignment="Center" ></TextBox>
-                <Button FontSize="18" Margin="0,0,5,0"  x:Name="getEntriesButton" Content="Get Entries" HorizontalAlignment="Center" Command="{Binding GetEntriesCommand}" CommandParameter="{Binding Text,ElementName=getEntriesPasswordBox}" />
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,10" HorizontalAlignment="Right">
+                <PasswordBox Padding="5" FontSize="18" Margin="0,0,10,0" x:Name="getEntriesPasswordBox" MinWidth="200"  HorizontalAlignment="Center" ></PasswordBox>
+                <Button FontSize="18" Margin="0,0,5,0"  x:Name="getEntriesButton" Content="Get Entries" HorizontalAlignment="Center" Click="GetEntriesButton_OnClick" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBox  FontSize="18" Margin="0,0,10,0" x:Name="AddEntryPasswordBox" MinWidth="{Binding ActualWidth,ElementName=getEntriesButton}"   HorizontalAlignment="Center" ></TextBox>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,10" HorizontalAlignment="Right">
+                <PasswordBox Padding="5"  FontSize="18" Margin="0,0,10,0" x:Name="AddEntryPasswordBox" MinWidth="200"   HorizontalAlignment="Center" ></PasswordBox>
                 <Button FontSize="18" Margin="0,0,5,0" MinWidth="{Binding ElementName=getEntriesButton,Path=ActualWidth}"  x:Name="AddEntryButton" Content="Add Entry" HorizontalAlignment="Center" Click="AddEntryButton_OnClick" />
             </StackPanel>
             <StackPanel Visibility="Collapsed" Name="AddEntrySP" Orientation="Vertical">
-            <TextBox Text="{Binding Content}" FontSize="18" HorizontalAlignment="Stretch" Margin="50,10,50,0" MinWidth="200"  MinHeight="200" AcceptsReturn="True" AcceptsTab="True" TextWrapping="WrapWithOverflow"/>
-                <Button Content="Add" HorizontalAlignment="Center" MinWidth="200" Command="{Binding AddEntryCommand}" CommandParameter="{Binding ElementName=AddEntryPasswordBox,Path=Text}" FontSize="18" ></Button>
+            <TextBox  Text="{Binding Content}" FontSize="18" HorizontalAlignment="Stretch" Margin="50,10,50,0" MinWidth="200"  MinHeight="200" AcceptsReturn="True" AcceptsTab="True" TextWrapping="WrapWithOverflow"/>
+                <Button Content="Add" x:Name="AddEntryActionButton" Click="AddEntryActionButton_Onclick"  HorizontalAlignment="Center" MinWidth="200"   FontSize="18" ></Button>
             </StackPanel>
             <ListBox ItemsSource="{Binding Entries}">
               <ListBox.ItemTemplate>
