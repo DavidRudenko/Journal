@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Globalization;
+using Journal.Security;
 using Journal.Security.Decryption;
 using Journal.Security.Encryption;
 
@@ -17,7 +18,6 @@ namespace Journal.StorageProviders
                 throw new ArgumentException(nameof(context));
             this._context = context;
         }
-        
         public List<JournalEntry> GetEntries(string password)
         {
             var entitiesContext = (_context as JournalEntities);
@@ -32,13 +32,12 @@ namespace Journal.StorageProviders
             }
             return list;
         }
-
         public void AddEntry(JournalEntry entry,string password)
         {
             var entitiesContext = (_context as JournalEntities);
             if (entitiesContext == null)
                 throw new ArgumentException($"{nameof(_context)} must be a JournalEntities instance");
-            var encryptedTimeStamp =new RijndaelEncryptor().Encrypt(entry.TimeStamp.ToString(CultureInfo.InvariantCulture),password);
+            var encryptedTimeStamp =new RijndaelEncryptor().Encrypt(entry.TimeStamp.ToString(CultureInfo.CurrentCulture),password);
             var encryptedContent=new RijndaelEncryptor().Encrypt(entry.Content,password);
             entitiesContext.Entries.Add(new Entry()
             {

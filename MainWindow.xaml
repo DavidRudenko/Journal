@@ -4,12 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ignore="http://www.galasoft.ch/ignore"
+        xmlns:custom="clr-namespace:Journal"
         mc:Ignorable="d ignore"
-        Height="300"
-        Width="300"
         Title="MVVM Light Application"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
-    
+
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -19,6 +18,31 @@
     </Window.Resources>
 
     <Grid x:Name="LayoutRoot">
-
-    </Grid>
+        <StackPanel Margin="10"  Orientation="Vertical">
+            <StackPanel x:Name="setPassSP"  Orientation="Vertical">
+                <Button x:Name="SetPasswordBtn" Click="SetPasswordBtn_OnClick"  HorizontalAlignment="Center" Content="Set Password" FontSize="18"  />
+                <PasswordBox x:Name="setPasswordBox"  HorizontalAlignment="Center" MinHeight="20" Margin="5"  MinWidth="{Binding ActualWidth,ElementName=SetPasswordBtn}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBox  FontSize="18" Margin="0,0,10,0" x:Name="getEntriesPasswordBox" MinWidth="{Binding ActualWidth,ElementName=getEntriesButton}"  HorizontalAlignment="Center" ></TextBox>
+                <Button FontSize="18" Margin="0,0,5,0"  x:Name="getEntriesButton" Content="Get Entries" HorizontalAlignment="Center" Command="{Binding GetEntriesCommand}" CommandParameter="{Binding Text,ElementName=getEntriesPasswordBox}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBox  FontSize="18" Margin="0,0,10,0" x:Name="AddEntryPasswordBox" MinWidth="{Binding ActualWidth,ElementName=getEntriesButton}"   HorizontalAlignment="Center" ></TextBox>
+                <Button FontSize="18" Margin="0,0,5,0" MinWidth="{Binding ElementName=getEntriesButton,Path=ActualWidth}"  x:Name="AddEntryButton" Content="Add Entry" HorizontalAlignment="Center" Click="AddEntryButton_OnClick" />
+            </StackPanel>
+            <StackPanel Visibility="Collapsed" Name="AddEntrySP" Orientation="Vertical">
+            <TextBox Text="{Binding Content}" FontSize="18" HorizontalAlignment="Stretch" Margin="50,10,50,0" MinWidth="200"  MinHeight="200" AcceptsReturn="True" AcceptsTab="True" TextWrapping="WrapWithOverflow"/>
+                <Button Content="Add" HorizontalAlignment="Center" MinWidth="200" Command="{Binding AddEntryCommand}" CommandParameter="{Binding ElementName=AddEntryPasswordBox,Path=Text}" FontSize="18" ></Button>
+            </StackPanel>
+            <ListBox ItemsSource="{Binding Entries}">
+              <ListBox.ItemTemplate>
+                  <DataTemplate>
+                      <custom:EntryView Timestamp="{Binding TimeStamp}" EntryContent="{Binding Content}"/>
+                  </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+        
+       </Grid>
 </Window>

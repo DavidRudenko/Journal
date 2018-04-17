@@ -13,7 +13,9 @@ namespace Journal.Security.Encryption
         
         private ICryptoTransform GetEncryptor(string password)
         {
-            var rijndael = new RijndaelManaged() {Key = KeyProvider.GetKey(password), IV=KeyProvider.GetIV(password)};
+            if (!KeyProvider.CorrectPassword(password))
+                throw new Exception("Password isn`t correct");
+            var rijndael = new RijndaelManaged() {Key = KeyProvider.GetKey(), IV=KeyProvider.GetIV()};
             return rijndael.CreateEncryptor();
         }
         

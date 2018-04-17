@@ -13,13 +13,27 @@ namespace Journal.Security
             0xee, 0xc5, 0xfe, 0x07, 0xaf, 0x4d, 0x08, 0x22, 0x3c };//Random salt, might put it into 
         // file,but leaving it open won`t do much damage to security
         private static object _locker = new object();
-        public static byte[] GetKey(string password)
+
+        private static string password = null;
+        public static byte[] GetKey()
         {
             var db=new Rfc2898DeriveBytes(password,_salt);
             return db.GetBytes(32);
         }
 
-        public static byte[] GetIV(string password)
+        public static void SetPassword(string oldPassword, string newPassword)
+        {
+            if (oldPassword == password)
+                password = newPassword;
+            else
+                throw new Exception("Passwords don`t match");
+        }
+
+        public static bool CorrectPassword(string pass)
+        {
+            return pass == password;
+        }
+        public static byte[] GetIV()
         {
             var db=new Rfc2898DeriveBytes(password,_salt);
             return db.GetBytes(16);

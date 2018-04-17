@@ -13,9 +13,11 @@ namespace Journal.Security.Decryption
 
         public string Decrypt(string encryptedContent,string password)
         {
+            if (!KeyProvider.CorrectPassword(password))
+                throw new Exception("Password isn`t correct");
             var buffer = Convert.FromBase64String(encryptedContent);
             string decrypted;
-            var transform = GetDecryptor(password);
+            var transform = GetDecryptor();
             using (var ms = new MemoryStream())
             {
                 using (var cs = new CryptoStream(ms, transform, CryptoStreamMode.Write))
@@ -32,9 +34,9 @@ namespace Journal.Security.Decryption
             return decrypted;
         }
 
-        private ICryptoTransform GetDecryptor(string password)
+        private ICryptoTransform GetDecryptor()
         {
-            var rijndael = new RijndaelManaged {Key = KeyProvider.GetKey(password), IV = KeyProvider.GetIV(password)};
+            var rijndael = new RijndaelManaged {Key = KeyProvider.GetKey(), IV = KeyProvider.GetIV()};
            return rijndael.CreateDecryptor();
         }
     }

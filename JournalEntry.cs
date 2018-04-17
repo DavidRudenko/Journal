@@ -20,6 +20,11 @@ namespace Journal
              Content = content;
             
         }
+
+        public override string ToString()
+        {
+            return "TimeStamp: " + TimeStamp + ", Content: " + Content;
+        }
         
     }
 }
